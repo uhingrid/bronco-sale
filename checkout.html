@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <base target="_top">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    :root {
+      --bg: #F4F3F0;
+      --navy: #152A54;
+      --red: #C8102E;
+      --ink: #1C2230;
+      --card: #FFFFFF;
+      --green: #1E7145;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: var(--ink); }
+    .header { position: sticky; top: 0; z-index: 20; background: var(--navy); border-bottom: 3px solid var(--red); padding: 16px 16px 12px; }
+    .header-top { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .brand h1 { font-family: 'Oswald', sans-serif; color: #fff; font-size: 19px; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 1.1; }
+    .brand p { font-size: 10px; font-weight: 600; color: var(--red); letter-spacing: 1px; text-transform: uppercase; margin: 0; }
+    .icon-btn { background: none; border: none; cursor: pointer; padding: 4px; }
+    .sync-row { display: flex; align-items: center; gap: 8px; }
+    .sync-error { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+    .sync-error p { font-size: 11px; color: #F5A3A3; margin: 0; }
+    .reconnect-btn { background: var(--red); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .tabs { display: flex; gap: 4px; margin-top: 12px; }
+    .tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; color: #fff; opacity: 0.6; background: transparent; }
+    .tab-btn.active { opacity: 1; background: var(--red); }
+    .content { padding: 16px; padding-bottom: 90px; }
+    .search-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .search-box { flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; background: #fff; border: 1.5px solid #1c223022; }
+    .search-box input { border: none; outline: none; background: transparent; font-size: 14px; width: 100%; font-family: 'Inter', sans-serif; }
+    select { padding: 8px; border-radius: 8px; border: 1.5px solid #1c223022; font-size: 14px; background: #fff; font-family: 'Inter', sans-serif; }
+    .empty-msg { text-align: center; padding: 48px 0; opacity: 0.5; font-family: 'Oswald', sans-serif; font-size: 17px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .item-card { text-align: left; padding: 12px; border-radius: 8px; background: var(--card); border: 1px solid #1c223015; border-top: 4px solid var(--navy); position: relative; cursor: pointer; }
+    .item-card.in-cart { border: 2px solid var(--green); border-top: 4px solid var(--green); background: #1E714512; }
+    .cart-check { position: absolute; top: 8px; left: 8px; background: var(--green); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+    .item-code { position: absolute; top: 8px; right: 8px; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+    .item-seller { font-size: 10px; font-weight: 600; color: var(--red); text-transform: uppercase; letter-spacing: 0.4px; margin: 0; }
+    .item-name { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 700; color: var(--ink); margin: 2px 0 8px; line-height: 1.25; }
+    .item-price { font-size: 18px; font-weight: 700; color: var(--navy); margin: 0; }
+    .summary-card { padding: 12px; border-radius: 8px; background: var(--card); border: 1px solid #1c223015; margin-bottom: 12px; }
+    .summary-top { display: flex; align-items: center; justify-content: space-between; }
+    .summary-label { font-size: 12px; opacity: 0.6; margin: 0; }
+    .summary-total { font-family: 'Oswald', sans-serif; font-size: 26px; font-weight: 700; margin: 0; }
+    .summary-sub { font-size: 12px; opacity: 0.6; margin: 2px 0 0; }
+    .print-btn { display: flex; align-items: center; gap: 6px; background: var(--navy); color: #fff; border: none; border-radius: 8px; padding: 8px 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .seller-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--card); border: 1px solid #1c223015; margin-bottom: 8px; }
+    .seller-name-row { display: flex; align-items: center; gap: 8px; }
+    .seller-name { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; margin: 0; }
+    .text-pill { display: inline-flex; align-items: center; gap: 4px; background: var(--navy); color: var(--bg); border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 600; text-decoration: none; }
+    .no-phone { font-size: 11px; opacity: 0.4; }
+    .sold-count { font-size: 12px; opacity: 0.6; margin: 4px 0 0; }
+    .sold-row { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 8px; background: var(--card); border: 1px solid #1c223015; margin-bottom: 8px; }
+    .sold-meta { font-size: 11px; opacity: 0.6; margin: 2px 0 0; }
+    .undo-btn { background: none; border: none; cursor: pointer; opacity: 0.5; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 30; background: #00000055; display: flex; align-items: flex-end; justify-content: center; padding: 16px; }
+    .modal { width: 100%; max-width: 400px; border-radius: 16px; padding: 20px; background: var(--card); }
+    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .modal-close { background: none; border: none; cursor: pointer; opacity: 0.6; }
+    .modal-seller { font-size: 11px; font-weight: 600; color: var(--red); text-transform: uppercase; margin: 0; }
+    .modal-item { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; margin: 0; }
+    label.field-label { font-size: 12px; font-weight: 600; opacity: 0.8; display: block; margin-bottom: 4px; }
+    .price-input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .price-input-row span { font-size: 20px; font-weight: 700; }
+    .price-input-row input { flex: 1; font-size: 20px; font-weight: 700; padding: 6px 8px; border-radius: 8px; border: 1.5px solid #1c223022; font-family: 'Inter', sans-serif; }
+    .pay-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    .pay-btn { flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; border: 1.5px solid #1c223022; background: #fff; }
+    .pay-btn.active { background: var(--ink); color: var(--bg); }
+    .confirm-btn { width: 100%; padding: 12px; border-radius: 8px; font-weight: 700; color: #fff; background: var(--green); border: none; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .confirm-btn:disabled { opacity: 0.5; }
+
+    .cart-bar { position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 25; background: var(--navy); color: #fff; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); cursor: pointer; }
+    .cart-bar-count { background: var(--red); border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 700; }
+    .cart-bar-total { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; flex: 1; }
+    .cart-bar-cta { font-size: 13px; font-weight: 600; opacity: 0.85; }
+    .cart-modal { max-height: 85vh; display: flex; flex-direction: column; }
+    .cart-list { overflow-y: auto; margin-bottom: 12px; max-height: 40vh; }
+    .cart-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #1c223015; }
+    .cart-row-info { flex: 1; min-width: 0; }
+    .cart-row-item { font-size: 14px; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cart-row-meta { font-size: 11px; opacity: 0.6; margin: 2px 0 0; }
+    .cart-row-price { display: flex; align-items: center; gap: 2px; width: 76px; }
+    .cart-row-price span { font-size: 14px; font-weight: 700; }
+    .cart-row-price input { width: 100%; font-size: 14px; font-weight: 700; padding: 4px 6px; border-radius: 6px; border: 1.5px solid #1c223022; font-family: 'Inter', sans-serif; }
+    .cart-remove-btn { background: none; border: none; cursor: pointer; padding: 4px; }
+    .cart-total-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 2px solid var(--ink); margin-bottom: 12px; font-weight: 700; }
+    .cart-total-amt { font-family: 'Oswald', sans-serif; font-size: 20px; color: var(--navy); }
+    .setup-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .setup-card { width: 100%; max-width: 380px; padding: 28px; border-radius: 16px; background: var(--card); border: 2px solid var(--navy); box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; }
+    .setup-card h1 { font-family: 'Oswald', sans-serif; color: var(--navy); font-size: 24px; text-transform: uppercase; margin: 0 0 4px; }
+    .setup-card p.sub { font-size: 11px; font-weight: 600; color: var(--red); letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 20px; }
+    .print-only { display: none; }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: #fff; }
+      .seller-block { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app"></div>
+
+  <script>
+    // -------- API base: this same deployment, no page param --------
+    // PASTE YOUR APPS SCRIPT WEB APP URL BELOW (ends in /exec) — this is the
+    // only line you need to edit before uploading this file to GitHub.
+    var API_URL = 'https://script.google.com/macros/s/AKfycbzqQZ_EP7TsmaZs0E7FFUNeij8KBmJAnZOw4mOlwPAIXfP80sjj31k6U6fe8jvrDirAqA/exec';
+
+    function money(n) { return '$' + (Number(n) || 0).toFixed(2); }
+
+    function smsHref(phone, body) {
+      if (!phone) return null;
+      var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      var sep = isIOS ? '&' : '?';
+      return 'sms:' + phone + sep + 'body=' + encodeURIComponent(body);
+    }
+
+    function sellerSummaryText(name, soldItems, remainingItems, total) {
+      var lines = ['Hi ' + name + '! Your Bronco uniform sale summary:', 'Sold: ' + soldItems.length + ' item(s) — ' + money(total) + ' total.'];
+      if (remainingItems.length > 0) {
+        lines.push('Unsold, ready for pickup: ' + remainingItems.map(function (i) { return i.Item; }).join(', ') + '.');
+      } else {
+        lines.push('Everything sold — nothing left to pick up!');
+      }
+      return lines.join(' ');
+    }
+
+    // -------------------- state --------------------
+    var state = {
+      items: [],
+      loading: false,
+      syncError: null,
+      tab: 'sell',
+      search: '',
+      sellerFilter: 'All',
+      cart: [], // [{id, item, seller, code, price}]
+      showCart: false,
+      cartPayMethod: 'Cash',
+      cartConfirming: false,
+      printView: false
+    };
+
+    function setState(patch) {
+      Object.assign(state, patch);
+      render();
+    }
+
+    // -------------------- data fetching --------------------
+    function fetchInventory() {
+      setState({ loading: true, syncError: null });
+      fetch(API_URL)
+        .then(function (res) { if (!res.ok) throw new Error('bad status'); return res.json(); })
+        .then(function (data) {
+          setState({ items: data.items || [], loading: false });
+        })
+        .catch(function () {
+          setState({ loading: false, syncError: 'Could not reach the sheet. Check your connection and try again.' });
+        });
+    }
+
+    function postAction(payload) {
+      return fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      }).then(function (res) { return res.json(); });
+    }
+
+    fetchInventory();
+    setInterval(fetchInventory, 20000);
+
+    // -------------------- derived data --------------------
+    function getSellers() {
+      var set = {};
+      state.items.forEach(function (i) { if (i.Seller) set[i.Seller] = true; });
+      return ['All'].concat(Object.keys(set).sort());
+    }
+
+    function getAvailable() {
+      return state.items.filter(function (i) {
+        if (String(i.Status).toLowerCase() !== 'available') return false;
+        if (state.sellerFilter !== 'All' && i.Seller !== state.sellerFilter) return false;
+        var haystack = (i.Item + ' ' + i.Seller + ' ' + (i.Code || '')).toLowerCase();
+        if (state.search && haystack.indexOf(state.search.toLowerCase()) === -1) return false;
+        return true;
+      });
+    }
+
+    function getSold() {
+      return state.items
+        .filter(function (i) { return String(i.Status).toLowerCase() === 'sold'; })
+        .sort(function (a, b) { return new Date(b.Timestamp || 0) - new Date(a.Timestamp || 0); });
+    }
+
+    function getSellerTotals() {
+      var map = {};
+      state.items.forEach(function (i) {
+        if (!i.Seller) return;
+        if (!map[i.Seller]) map[i.Seller] = { count: 0, total: 0, items: [] };
+        if (String(i.Status).toLowerCase() === 'sold') {
+          map[i.Seller].count += 1;
+          map[i.Seller].total += Number(i.SoldPrice || 0);
+          map[i.Seller].items.push(i);
+        }
+      });
+      return Object.keys(map).map(function (k) { return [k, map[k]]; }).sort(function (a, b) { return b[1].total - a[1].total; });
+    }
+
+    function getRemainingBySeller() {
+      var map = {};
+      state.items.forEach(function (i) {
+        if (!i.Seller) return;
+        if (String(i.Status).toLowerCase() !== 'available') return;
+        if (!map[i.Seller]) map[i.Seller] = [];
+        map[i.Seller].push(i);
+      });
+      return map;
+    }
+
+    function getAllSellerNames() {
+      var set = {};
+      state.items.forEach(function (i) { if (i.Seller) set[i.Seller] = true; });
+      return Object.keys(set).sort();
+    }
+
+    // -------------------- actions --------------------
+    function isInCart(id) {
+      return state.cart.some(function (c) { return c.id === id; });
+    }
+
+    function toggleCartItem(item) {
+      if (isInCart(item.ID)) {
+        state.cart = state.cart.filter(function (c) { return c.id !== item.ID; });
+      } else {
+        state.cart = state.cart.concat([{ id: item.ID, item: item.Item, seller: item.Seller, code: item.Code, price: Number(item.Price) || 0 }]);
+      }
+      render();
+    }
+
+    function removeFromCart(id) {
+      state.cart = state.cart.filter(function (c) { return c.id !== id; });
+      render();
+    }
+
+    function updateCartPrice(id, price) {
+      state.cart = state.cart.map(function (c) { return c.id === id ? Object.assign({}, c, { price: price }) : c; });
+    }
+
+    function cartTotal() {
+      return state.cart.reduce(function (s, c) { return s + (Number(c.price) || 0); }, 0);
+    }
+
+    function confirmCartSale() {
+      if (state.cart.length === 0) return;
+      setState({ cartConfirming: true });
+      var cart = state.cart;
+      var payMethod = state.cartPayMethod;
+      var now = new Date().toISOString();
+      var idsSet = {};
+      cart.forEach(function (c) { idsSet[c.id] = c.price; });
+
+      state.items = state.items.map(function (i) {
+        if (idsSet.hasOwnProperty(i.ID)) {
+          return Object.assign({}, i, { Status: 'Sold', SoldPrice: idsSet[i.ID], PaymentMethod: payMethod, Timestamp: now });
+        }
+        return i;
+      });
+      setState({ cart: [], showCart: false, cartConfirming: false, cartPayMethod: 'Cash' });
+
+      postAction({
+        action: 'sell_batch',
+        items: cart.map(function (c) { return { id: c.id, soldPrice: c.price }; }),
+        paymentMethod: payMethod
+      })
+        .catch(function () { setState({ syncError: 'Sale saved locally but failed to sync — check your connection.' }); })
+        .then(fetchInventory);
+    }
+
+    function undoSale(item) {
+      state.items = state.items.map(function (i) {
+        if (i.ID === item.ID) return Object.assign({}, i, { Status: 'Available', SoldPrice: '', PaymentMethod: '', Timestamp: '' });
+        return i;
+      });
+      render();
+      postAction({ action: 'restock', id: item.ID }).then(fetchInventory);
+    }
+
+    function triggerPrint() {
+      setState({ printView: true });
+      setTimeout(function () { window.print(); }, 80);
+    }
+
+    window.addEventListener('afterprint', function () { setState({ printView: false }); });
+
+    // -------------------- rendering --------------------
+    function el(html) {
+      var div = document.createElement('div');
+      div.innerHTML = html.trim();
+      return div.firstChild;
+    }
+
+    function render() {
+      var app = document.getElementById('app');
+      app.innerHTML = '';
+      app.appendChild(state.printView ? renderPrintView() : renderMain());
+      attachHandlers();
+    }
+
+    function renderMain() {
+      var sellers = getSellers();
+      var available = getAvailable();
+      var sold = getSold();
+      var sellerTotals = getSellerTotals();
+      var grandTotal = sold.reduce(function (s, i) { return s + Number(i.SoldPrice || 0); }, 0);
+      var cashTotal = sold.filter(function (i) { return i.PaymentMethod === 'Cash'; }).reduce(function (s, i) { return s + Number(i.SoldPrice || 0); }, 0);
+      var venmoTotal = sold.filter(function (i) { return i.PaymentMethod === 'Venmo'; }).reduce(function (s, i) { return s + Number(i.SoldPrice || 0); }, 0);
+      var remainingBySeller = getRemainingBySeller();
+
+      var html = '' +
+        '<div class="header">' +
+          '<div class="header-top">' +
+            '<div class="brand">' +
+              '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 3l1 2h10l1-2M4 8l3-3h10l3 3-3 3v10H7V8L4 8z"/></svg>' +
+              '<div><h1>Bronco Uniform Exchange</h1><p>Bay Area Christian School</p></div>' +
+            '</div>' +
+            '<div class="sync-row">' +
+              '<button class="icon-btn" id="refreshBtn" title="Refresh"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></button>' +
+            '</div>' +
+          '</div>' +
+          (state.syncError ? '<div class="sync-error"><p>' + state.syncError + '</p><button class="reconnect-btn" id="retryBtn">Retry</button></div>' : '') +
+          '<div class="tabs">' +
+            tabBtn('sell', 'Sell') + tabBtn('sellers', 'Sellers') + tabBtn('sold', 'Sold') +
+          '</div>' +
+        '</div>' +
+        '<div class="content">' + renderTabContent(available, sold, sellerTotals, grandTotal, cashTotal, venmoTotal, remainingBySeller, sellers) + '</div>' +
+        (state.cart.length > 0 && !state.showCart ? renderCartBar() : '') +
+        (state.showCart ? renderCartPanel() : '');
+
+      var wrap = document.createElement('div');
+      wrap.innerHTML = html;
+      return wrap;
+    }
+
+    function tabBtn(id, label) {
+      return '<button class="tab-btn' + (state.tab === id ? ' active' : '') + '" data-tab="' + id + '">' + label + '</button>';
+    }
+
+    function renderTabContent(available, sold, sellerTotals, grandTotal, cashTotal, venmoTotal, remainingBySeller, sellers) {
+      if (state.tab === 'sell') {
+        var options = sellers.map(function (s) { return '<option' + (s === state.sellerFilter ? ' selected' : '') + '>' + s + '</option>'; }).join('');
+        var cards = available.map(function (item) {
+          var inCart = isInCart(item.ID);
+          return '' +
+            '<div class="item-card' + (inCart ? ' in-cart' : '') + '" data-id="' + item.ID + '">' +
+              (item.Code ? '<span class="item-code">' + item.Code + '</span>' : '') +
+              (inCart ? '<span class="cart-check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>' : '') +
+              '<p class="item-seller">' + item.Seller + '</p>' +
+              '<p class="item-name">' + item.Item + '</p>' +
+              '<p class="item-price">' + money(item.Price) + '</p>' +
+            '</div>';
+        }).join('');
+        return '' +
+          '<div class="search-row">' +
+            '<div class="search-box"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1C2230" stroke-width="2" opacity="0.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>' +
+            '<input id="searchInput" placeholder="Search item, seller, or code..." value="' + state.search + '"></div>' +
+            '<select id="sellerSelect">' + options + '</select>' +
+          '</div>' +
+          (available.length === 0 && !state.loading ? '<p class="empty-msg">No items match — everything here has been snapped up, or try a different search.</p>' : '') +
+          '<div class="grid">' + cards + '</div>';
+      }
+
+      if (state.tab === 'sellers') {
+        var rows = sellerTotals.map(function (pair) {
+          var name = pair[0], data = pair[1];
+          var remaining = remainingBySeller[name] || [];
+          var href = smsHref(null, ''); // placeholder, filled in via data lookup below
+          return { name: name, data: data, remaining: remaining };
+        });
+        var rowsHtml = rows.map(function (r) {
+          return '' +
+            '<div class="seller-row">' +
+              '<div>' +
+                '<div class="seller-name-row"><p class="seller-name">' + r.name + '</p>' +
+                  '<span class="text-btn-slot" data-seller="' + r.name + '"></span>' +
+                '</div>' +
+                '<p class="sold-count">' + r.data.count + ' item' + (r.data.count === 1 ? '' : 's') + ' sold</p>' +
+              '</div>' +
+              '<p class="item-price">' + money(r.data.total) + '</p>' +
+            '</div>';
+        }).join('');
+        return '' +
+          '<div class="summary-card">' +
+            '<div class="summary-top">' +
+              '<div><p class="summary-label">Total sales</p><p class="summary-total">' + money(grandTotal) + '</p>' +
+              '<p class="summary-sub">Cash ' + money(cashTotal) + ' · Venmo ' + money(venmoTotal) + '</p></div>' +
+              '<button class="print-btn" id="printBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print</button>' +
+            '</div>' +
+          '</div>' +
+          (rows.length === 0 ? '<p class="empty-msg" style="padding:40px 0;">No sales yet.</p>' : rowsHtml);
+      }
+
+      // sold tab
+      var soldHtml = sold.map(function (item) {
+        return '' +
+          '<div class="sold-row">' +
+            '<div><p style="font-weight:600;font-size:14px;margin:0;">' + item.Item + '</p>' +
+            '<p class="sold-meta">' + item.Seller + ' · ' + item.PaymentMethod + ' · ' + (item.Timestamp ? new Date(item.Timestamp).toLocaleTimeString() : '') + '</p></div>' +
+            '<div style="display:flex;align-items:center;gap:12px;">' +
+              '<p style="font-weight:700;color:var(--green);margin:0;">' + money(item.SoldPrice) + '</p>' +
+              '<button class="undo-btn" data-undo-id="' + item.ID + '" title="Undo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1C2230" stroke-width="2" opacity="0.5"><path d="M3 7v6h6M3 13a9 9 0 1013-9"/></svg></button>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+      return sold.length === 0 ? '<p class="empty-msg" style="padding:40px 0;">Nothing sold yet.</p>' : soldHtml;
+    }
+
+    function renderCartBar() {
+      return '' +
+        '<div class="cart-bar" id="cartBarBtn">' +
+          '<span class="cart-bar-count">' + state.cart.length + ' item' + (state.cart.length === 1 ? '' : 's') + '</span>' +
+          '<span class="cart-bar-total">' + money(cartTotal()) + '</span>' +
+          '<span class="cart-bar-cta">View cart →</span>' +
+        '</div>';
+    }
+
+    function renderCartPanel() {
+      var rows = state.cart.map(function (c) {
+        return '' +
+          '<div class="cart-row">' +
+            '<div class="cart-row-info">' +
+              '<p class="cart-row-item">' + c.item + '</p>' +
+              '<p class="cart-row-meta">' + c.seller + (c.code ? ' · ' + c.code : '') + '</p>' +
+            '</div>' +
+            '<div class="cart-row-price"><span>$</span><input type="number" step="0.25" class="cart-price-input" data-cart-id="' + c.id + '" value="' + c.price + '"></div>' +
+            '<button class="cart-remove-btn" data-cart-remove="' + c.id + '"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C8102E" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>' +
+          '</div>';
+      }).join('');
+
+      return '' +
+        '<div class="modal-overlay" id="cartOverlay">' +
+          '<div class="modal cart-modal">' +
+            '<div class="modal-header">' +
+              '<p class="modal-item">Cart (' + state.cart.length + ')</p>' +
+              '<button class="modal-close" id="cartCloseBtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C2230" stroke-width="2" opacity="0.6"><path d="M18 6L6 18M6 6l12 12"/></svg></button>' +
+            '</div>' +
+            (state.cart.length === 0
+              ? '<p class="empty-msg" style="padding:20px 0;">Cart is empty — tap items in the Sell tab to add them.</p>'
+              : '<div class="cart-list">' + rows + '</div>' +
+                '<div class="cart-total-row"><span>Total</span><span class="cart-total-amt">' + money(cartTotal()) + '</span></div>' +
+                '<label class="field-label">Payment method</label>' +
+                '<div class="pay-row">' +
+                  '<button class="pay-btn' + (state.cartPayMethod === 'Cash' ? ' active' : '') + '" data-cart-pay="Cash">Cash</button>' +
+                  '<button class="pay-btn' + (state.cartPayMethod === 'Venmo' ? ' active' : '') + '" data-cart-pay="Venmo">Venmo</button>' +
+                '</div>' +
+                '<button class="confirm-btn" id="confirmCartBtn"' + (state.cartConfirming ? ' disabled' : '') + '><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Complete sale — ' + money(cartTotal()) + '</button>') +
+          '</div>' +
+        '</div>';
+    }
+
+    function renderPrintView() {
+      var allSellerNames = getAllSellerNames();
+      var remainingBySeller = getRemainingBySeller();
+      var sold = getSold();
+      var grandTotal = sold.reduce(function (s, i) { return s + Number(i.SoldPrice || 0); }, 0);
+      var cashTotal = sold.filter(function (i) { return i.PaymentMethod === 'Cash'; }).reduce(function (s, i) { return s + Number(i.SoldPrice || 0); }, 0);
+      var venmoTotal = sold.filter(function (i) { return i.PaymentMethod === 'Venmo'; }).reduce(function (s, i) { return s + Number(i.SoldPrice || 0); }, 0);
+
+      var blocks = allSellerNames.map(function (name) {
+        var soldData = state.items.filter(function (i) { return i.Seller === name && String(i.Status).toLowerCase() === 'sold'; });
+        var remaining = remainingBySeller[name] || [];
+        var total = soldData.reduce(function (s, i) { return s + Number(i.SoldPrice || 0); }, 0);
+        var phoneRow = sellerPhoneLookup[name];
+        var href = phoneRow ? smsHref(phoneRow, sellerSummaryText(name, soldData, remaining, total)) : null;
+
+        var soldRows = soldData.map(function (i) {
+          return '<tr style="border-top:1px solid #eee;"><td style="padding:3px 4px;">' + i.Item + '</td><td style="padding:3px 4px;">' + money(i.SoldPrice) + '</td><td style="padding:3px 4px;">' + i.PaymentMethod + '</td></tr>';
+        }).join('');
+        var remainRows = remaining.map(function (i) {
+          return '<tr style="border-top:1px solid #eee;"><td style="padding:3px 4px;">' + i.Item + '</td><td style="padding:3px 4px;">' + money(i.Price) + '</td></tr>';
+        }).join('');
+
+        return '' +
+          '<div class="seller-block" style="margin-bottom:28px;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #111;padding-bottom:4px;margin-bottom:8px;">' +
+              '<h2 style="font-size:17px;font-weight:700;margin:0;">' + name + '</h2>' +
+              (href ? '<a href="' + href + '" class="no-print" style="font-size:13px;font-weight:600;color:var(--red);text-decoration:none;">Text ' + name.split(' ')[0] + '</a>' : '') +
+            '</div>' +
+            '<p style="font-size:13px;font-weight:600;margin:0 0 4px;">Sold (' + soldData.length + ' item' + (soldData.length === 1 ? '' : 's') + ') — owed: ' + money(total) + '</p>' +
+            (soldData.length > 0 ? '<table style="width:100%;font-size:12px;margin-bottom:12px;border-collapse:collapse;"><thead><tr style="text-align:left;color:#555;"><th style="padding:2px 4px;">Item</th><th style="padding:2px 4px;">Price</th><th style="padding:2px 4px;">Payment</th></tr></thead><tbody>' + soldRows + '</tbody></table>' : '<p style="font-size:12px;color:#888;margin-bottom:12px;">Nothing sold.</p>') +
+            '<p style="font-size:13px;font-weight:600;margin:0 0 4px;">Remaining inventory (' + remaining.length + ' item' + (remaining.length === 1 ? '' : 's') + ')</p>' +
+            (remaining.length > 0 ? '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="text-align:left;color:#555;"><th style="padding:2px 4px;">Item</th><th style="padding:2px 4px;">Asking price</th></tr></thead><tbody>' + remainRows + '</tbody></table>' : '<p style="font-size:12px;color:#888;">Everything sold — nothing left to take home.</p>') +
+          '</div>';
+      }).join('');
+
+      var html = '' +
+        '<div class="no-print" style="display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid #ddd;">' +
+          '<button id="printBackBtn" style="background:none;border:none;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;">← Back</button>' +
+          '<button id="printNowBtn" class="print-btn">Print</button>' +
+        '</div>' +
+        '<div style="padding:24px;max-width:700px;margin:0 auto;background:#fff;color:#111;">' +
+          '<h1 style="font-size:22px;font-weight:700;margin:0 0 2px;">Bronco Uniform Exchange — End of Sale Report</h1>' +
+          '<p style="font-size:11px;font-weight:600;color:var(--red);letter-spacing:1px;text-transform:uppercase;margin:0 0 4px;">Bay Area Christian School</p>' +
+          '<p style="font-size:12px;color:#666;margin:0 0 18px;">' + new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + '</p>' +
+          '<div style="border:1px solid #ccc;border-radius:6px;padding:12px;margin-bottom:24px;font-size:13px;"><strong>Grand total sold:</strong> ' + money(grandTotal) + ' | Cash: ' + money(cashTotal) + ' | Venmo: ' + money(venmoTotal) + '</div>' +
+          (allSellerNames.length === 0 ? '<p>No inventory recorded.</p>' : blocks) +
+        '</div>';
+
+      var wrap = document.createElement('div');
+      wrap.style.background = '#fff';
+      wrap.style.minHeight = '100vh';
+      wrap.innerHTML = html;
+      return wrap;
+    }
+
+    // -------------------- seller phone lookup (from Sellers tab) --------------------
+    var sellerPhoneLookup = {};
+    function refreshSellerPhones() {
+      fetch(API_URL).then(function (r) { return r.json(); }).then(function (data) {
+        var map = {};
+        (data.sellers || []).forEach(function (s) {
+          if (s.Seller) map[s.Seller] = String(s.Phone || '').replace(/[^\\d+]/g, '');
+        });
+        sellerPhoneLookup = map;
+      }).catch(function () {});
+    }
+    refreshSellerPhones();
+    setInterval(refreshSellerPhones, 20000);
+
+    // -------------------- event wiring --------------------
+    function attachHandlers() {
+      var refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) refreshBtn.onclick = fetchInventory;
+
+      var retryBtn = document.getElementById('retryBtn');
+      if (retryBtn) retryBtn.onclick = fetchInventory;
+
+      document.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.onclick = function () { setState({ tab: btn.getAttribute('data-tab') }); };
+      });
+
+      var searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.oninput = function (e) { state.search = e.target.value; renderListOnly(); };
+        searchInput.focus();
+        searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+      }
+      var sellerSelect = document.getElementById('sellerSelect');
+      if (sellerSelect) sellerSelect.onchange = function (e) { setState({ sellerFilter: e.target.value }); };
+
+      document.querySelectorAll('.item-card').forEach(function (card) {
+        card.onclick = function () {
+          var id = card.getAttribute('data-id');
+          var item = state.items.filter(function (i) { return String(i.ID) === id; })[0];
+          if (item) toggleCartItem(item);
+        };
+      });
+
+      var cartBarBtn = document.getElementById('cartBarBtn');
+      if (cartBarBtn) cartBarBtn.onclick = function () { setState({ showCart: true }); };
+
+      var printBtn = document.getElementById('printBtn');
+      if (printBtn) printBtn.onclick = triggerPrint;
+
+      document.querySelectorAll('.text-btn-slot').forEach(function (slot) {
+        var name = slot.getAttribute('data-seller');
+        var phone = sellerPhoneLookup[name];
+        var pair = getSellerTotals().filter(function (p) { return p[0] === name; })[0];
+        var remaining = getRemainingBySeller()[name] || [];
+        if (phone && pair) {
+          var href = smsHref(phone, sellerSummaryText(name, pair[1].items, remaining, pair[1].total));
+          slot.outerHTML = '<a href="' + href + '" class="text-pill">Text</a>';
+        } else {
+          slot.outerHTML = '<span class="no-phone">No phone on file</span>';
+        }
+      });
+
+      document.querySelectorAll('[data-undo-id]').forEach(function (btn) {
+        btn.onclick = function () {
+          var id = btn.getAttribute('data-undo-id');
+          var item = state.items.filter(function (i) { return String(i.ID) === id; })[0];
+          if (item) undoSale(item);
+        };
+      });
+
+      var cartOverlay = document.getElementById('cartOverlay');
+      if (cartOverlay) {
+        cartOverlay.onclick = function (e) { if (e.target === cartOverlay) setState({ showCart: false }); };
+      }
+      var cartCloseBtn = document.getElementById('cartCloseBtn');
+      if (cartCloseBtn) cartCloseBtn.onclick = function () { setState({ showCart: false }); };
+
+      document.querySelectorAll('.cart-price-input').forEach(function (input) {
+        input.oninput = function (e) {
+          var id = input.getAttribute('data-cart-id');
+          updateCartPrice(id, parseFloat(e.target.value) || 0);
+          var totalEls = document.querySelectorAll('.cart-total-amt');
+          totalEls.forEach(function (el) { el.textContent = money(cartTotal()); });
+          var confirmBtn = document.getElementById('confirmCartBtn');
+          if (confirmBtn) confirmBtn.innerHTML = confirmBtn.innerHTML.replace(/Complete sale — .*/, 'Complete sale — ' + money(cartTotal()));
+        };
+      });
+
+      document.querySelectorAll('[data-cart-remove]').forEach(function (btn) {
+        btn.onclick = function () { removeFromCart(btn.getAttribute('data-cart-remove')); setState({ showCart: state.cart.length > 0 }); };
+      });
+
+      document.querySelectorAll('[data-cart-pay]').forEach(function (btn) {
+        btn.onclick = function () { setState({ cartPayMethod: btn.getAttribute('data-cart-pay') }); };
+      });
+
+      var confirmCartBtn = document.getElementById('confirmCartBtn');
+      if (confirmCartBtn) confirmCartBtn.onclick = confirmCartSale;
+
+      var printBackBtn = document.getElementById('printBackBtn');
+      if (printBackBtn) printBackBtn.onclick = function () { setState({ printView: false }); };
+      var printNowBtn = document.getElementById('printNowBtn');
+      if (printNowBtn) printNowBtn.onclick = function () { window.print(); };
+    }
+
+    // partial re-render for search typing (avoids losing input focus)
+    function renderListOnly() {
+      var contentEls = document.querySelectorAll('.content');
+      if (contentEls.length === 0) { render(); return; }
+      var available = getAvailable();
+      var cardsHtml = available.map(function (item) {
+        var inCart = isInCart(item.ID);
+        return '' +
+          '<div class="item-card' + (inCart ? ' in-cart' : '') + '" data-id="' + item.ID + '">' +
+            (item.Code ? '<span class="item-code">' + item.Code + '</span>' : '') +
+            (inCart ? '<span class="cart-check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>' : '') +
+            '<p class="item-seller">' + item.Seller + '</p>' +
+            '<p class="item-name">' + item.Item + '</p>' +
+            '<p class="item-price">' + money(item.Price) + '</p>' +
+          '</div>';
+      }).join('');
+      var gridEl = document.querySelector('.grid');
+      if (gridEl) {
+        gridEl.innerHTML = cardsHtml;
+        document.querySelectorAll('.item-card').forEach(function (card) {
+          card.onclick = function () {
+            var id = card.getAttribute('data-id');
+            var item = state.items.filter(function (i) { return String(i.ID) === id; })[0];
+            if (item) toggleCartItem(item);
+          };
+        });
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
